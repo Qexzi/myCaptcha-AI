@@ -30,7 +30,6 @@
 
 3. **语言验证码（如中文汉字）：** 使用 CRNN+CTC 的神经网络结构 
 
-
 **三类验证码均采用 CRNN+CTC 架构。选择这套方案的理由比较直接：**
 
 首先，CNN 负责从图像里提取视觉特征，这是后续所有判断的基础。接着，RNN（实际使用的是双向LSTM）会利用这些特征做序列建模，核心作用是结合上下文来区分容易混淆的字符——比如单独看一个点可能是`0`也可能是`O`，但在数字字母验证码里结合前后的字符信息，RNN能判断得更准。最后，CTC 层解决的是对齐问题：输入的图片宽度和输出的字符长度不是一一对应的，CTC允许模型跳过无关区域、压缩重复信息，直接把不等长的特征序列映射成最终文本串。
@@ -44,3 +43,33 @@
 ## 4.问题/方案/性能优化/部署
 
 pass
+
+
+### 4.1 模型部署
+
+使用docker部署，对外提高api接口
+
+---
+
+## Digital-Letters-OCR
+
+模型：src/Digital-Letters-OCR/
+
+
+可以识别以下类似的图形验证码：
+![alt text](images/Digital-Letters-OCR/example_tier1.png)
+
+![alt text](images/Digital-Letters-OCR/example_tier2.png)
+
+![alt text](images/Digital-Letters-OCR/example_tier3.png)
+
+![alt text](images/Digital-Letters-OCR/example_tier4.png)
+
+![alt text](images/Digital-Letters-OCR/example_tier5.png)
+
+目前模型准确率：76.39%
+
+![alt text](images/Digital-Letters-OCR/评估.png)
+
+---
+

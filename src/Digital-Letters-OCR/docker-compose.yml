@@ -1,0 +1,10 @@
+services:
+  captcha-ocr:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    image: digital-letters-ocr:${TAG:-cpu}
+    container_name: digital-letters-ocr
+    ports:
+      - "10800:5000"
+    restart: unless-stopped

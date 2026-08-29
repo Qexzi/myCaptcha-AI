@@ -1,0 +1,11 @@
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir flask Pillow -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+COPY app.py CRNN.py Digital-Letters.pth dataset.py noise_modules.py utils.py ./
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
