@@ -40,16 +40,42 @@
 
 ---
 
-## 4.问题/方案/性能优化/部署
-
-pass
+## 4.部署
 
 
-### 4.1 模型部署
+在部署之前，需要下载模型权重文件到本地`src/Digital-Letters-OCR/`目录下。
 
-使用docker部署，对外提高api接口
+1. 使用docker部署
+```bash
+docker compose up -d  # 默认是cpu模式
+docker compose up -d --gpus all  # 使用gpu模式
+```
+
+1. python依赖启动
+```bash
+pip install -r requirements.txt
+python app.py  # 启动服务api
+```
+
+
+
 
 ---
+
+
+## 5.问题与解决思路
+
+### 5.1 模型泛化
+
+
+
+验证码的难点在于同一类型也会有字体、倾斜、噪点、模糊程度等各种差异，如果只是死记硬背训练数据，换个画风就崩了。为此我做了几层防护：数据增强方面，训练时对每张图片随机做水平缩放抖动（±5%）、随机旋转（±5°）、高斯模糊（20% 概率）和高斯噪声（±0.05），这些增强随机组合，每个 epoch 模型看到的图都不一样，逼着它去学真正的字符特征而不是记住特定像素；模型结构方面，在 CNN 输出之后和两层 LSTM 之间各加了 40% 的 Dropout 随机失活，训练时每次 forward 都随机关掉一部分神经元，模型就不能偷懒依赖个别强特征，推理时全部保留相当于多个子模型的集成效果；训练策略方面，L2 权重衰减（1e-4）惩罚过大的权重让模型更平滑，梯度裁剪（max_norm=5）防止异常样本导致梯度爆炸，每隔 2 个 epoch 验证一次，准确率连续 6 次没提升就早停，同时配合 ReduceLROnPlateau 在平台期自动减半学习率，防止模型在训练集上刷分但验证集往下掉。这三层从数据、结构、策略三个维度同时下手，模型的泛化能力有所提升（起码可用），但是准确率又下降了，有得有失。
+
+
+
+
+---
+
 
 ## Digital-Letters-OCR
 
@@ -57,19 +83,30 @@ pass
 
 
 可以识别以下类似的图形验证码：
-![alt text](images/Digital-Letters-OCR/example_tier1.png)
 
-![alt text](images/Digital-Letters-OCR/example_tier2.png)
-
-![alt text](images/Digital-Letters-OCR/example_tier3.png)
-
-![alt text](images/Digital-Letters-OCR/example_tier4.png)
-
-![alt text](images/Digital-Letters-OCR/example_tier5.png)
+<table>
+  <tr>
+    <td><img src="images/Digital-Letters-OCR/example_tier1.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier2.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier3.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier4.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier5.png" width="200"></td>
+  </tr>
+</table>
 
 目前模型准确率：76.39%
 
-![alt text](images/Digital-Letters-OCR/评估.png)
+<div align="center">
+  <img src="images/Digital-Letters-OCR/评估.png">
+</div>
+
+
+部署后的服务api接口：**10800/recognize** ，返回结果为txt格式
+
+<div align="center">
+  <img src="images/Digital-Letters-OCR/api_test.png">
+</div>
+
 
 ---
 
