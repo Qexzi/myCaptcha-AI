@@ -7,11 +7,22 @@ from PIL import Image # 用于打开图片
 from PIL import ImageFilter
 
 class myDataset(Dataset):
-    def __init__(self, root_dir, train=True):
+    def __init__(self, root_dir, train=True, file_list=None):
+        """
+        :param root_dir: 图片目录。传 str=单个目录;传 list/tuple=多个目录(自动合并)
+        :param train: True=启用数据增强;False=不增强
+        :param file_list: 若提供,直接使用该图片路径列表(跳过目录扫描),用于微调的真实图过采样
+        """
         super(myDataset, self).__init__()
         self.train = train # True:训练集,启用数据增强; False:测试集,不增强
         self.transform = ResizeNormalize((64, None), train=train) # 高度64固定
-        all_paths = [os.path.join(root_dir, img) for img in os.listdir(root_dir)] # 每一张图片的完整路径
+        if file_list is not None:
+            all_paths = list(file_list)  # 显式路径列表(微调用)
+        else:
+            dirs = root_dir if isinstance(root_dir, (list, tuple)) else [root_dir]
+            all_paths = []
+            for d in dirs:
+                all_paths.extend(os.path.join(d, img) for img in os.listdir(d))
         # P0-3: 多来源合并的大数据集难免混入损坏图片,先全量校验剔除,防止训练中途崩溃
         self.images_path = self._filter_valid(all_paths)
 

@@ -7,4 +7,6 @@ services:
     container_name: digital-letters-ocr
     ports:
       - "10800:5000"
+    volumes:
+      - ./Digital-Letters.pth:/app/Digital-Letters.pth:ro   # 权重文件挂载
     restart: unless-stopped

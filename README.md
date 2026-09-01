@@ -18,7 +18,7 @@
 
 ## 2.路由ai
 
-目前先使用 CNN 网络结构，速度快且性能消耗小
+目前先使用 CNN 网络结构，速度快且性能消耗小（待议）
 
 ---
 
@@ -51,9 +51,10 @@
 ```bash
 docker compose up -d  # 默认是cpu模式
 docker compose up -d --gpus all  # 使用gpu模式
+docker compose build --no-cache  # 不缓存，重新构建容器
 ```
 
-1. python依赖启动
+2. python依赖下载启动
 ```bash
 pip install -r requirements.txt
 python app.py  # 启动服务api
@@ -90,7 +91,7 @@ python app.py  # 启动服务api
 模型：src/Digital-Letters-OCR/
 
 
-可以识别以下类似的图形验证码（当然模糊度高的准确率不高）：
+可以识别以下类似的图形验证码（当然模糊度太高的准确率不高）：
 
 <table>
   <tr>
@@ -109,13 +110,44 @@ python app.py  # 启动服务api
     <td><img src="images/Digital-Letters-OCR/example_tier10.jpg" width="200"></td>
   </tr>
 
+
+  <tr>
+    <td><img src="images/Digital-Letters-OCR/example_tier11.jpg" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier12.jpg" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier13.jpg" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier14.jpg" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier15.jpg" width="200"></td>
+  </tr>
+
+
+  <tr>
+    <td><img src="images/Digital-Letters-OCR/example_tier16.gif" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier17.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier18.png" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier19.jpg" width="200"></td>
+    <td><img src="images/Digital-Letters-OCR/example_tier20.png" width="200"></td>
+  </tr>
+
+
 </table>
 
-目前模型准确率：76.39%
+目前模型情况：
+- 合成测试集：~~76.39%~~ 76.61%
+- 真实测试集：90.48%
+
+合成测试集低的很可能的原因是我合成了大量连人类都很难识别的验证码，目的是提高模型的泛化能力
 
 <div align="center">
   <img src="images/Digital-Letters-OCR/评估.png">
 </div>
+
+续训每轮损失：
+<div align="center">  
+  <img src="images/Digital-Letters-OCR/loss_curve.png">
+</div>
+
+
+目前模型的准确率和泛化能力在实际场景中应该可以接受。
 
 
 部署后的服务api接口：**10800/recognize** ，返回结果为txt格式
