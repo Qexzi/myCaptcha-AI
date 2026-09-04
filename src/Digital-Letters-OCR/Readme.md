@@ -19,7 +19,7 @@
         Squeeze高度 → [B, 512, W/2]
             ↓
         ============ RNN序列建模 ============
-        BiLSTM(2层, hidden=256, dropout=0.1)
+        BiLSTM(2层, hidden=256, dropout=0.4)
             ↓
         [B, 512, W/2] → 双向LSTM → [B, 512, W/2]
             ↓
