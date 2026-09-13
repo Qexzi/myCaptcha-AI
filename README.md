@@ -2,7 +2,7 @@
 
 ## 1.项目介绍
 
-**目标是训练一个能识别各种类型且具有高识别率的图形验证码AI模型**
+**目标是训练一个能识别各种类型且具有高识别率、低消耗的图形验证码神经网络**
 
 
 **项目的架构：** 采用分层ai的架构，简单描述为 **"路由ai+功能ai"**，其中使用flask框架对外提供服务api，同时对内对各种功能ai的启动进行调度管理
@@ -68,8 +68,14 @@ python app.py  # 启动服务api
 
 ## 5.问题与解决思路
 
-### 5.1 模型泛化
+### 5.1 模型泛化与其评估策略
 
+参考论文：[Generalization in Neural Networks: A Broad Survey](https://arxiv.org/abs/2209.01610)
+
+主要包括三个方面：
+1. 样本泛化：训练集抽样与同分布合成测试集
+2. 分布泛化：合成测试集与扰动数据集（如随机缩放、随机旋转、高斯模糊、高斯噪声等）
+3. 域泛化：合成测试集与真实测试集的差异
 
 
 验证码的难点在于同一类型也会有字体、倾斜、噪点、模糊程度等各种差异，如果只是死记硬背训练数据，换个画风就崩了。
@@ -132,21 +138,29 @@ python app.py  # 启动服务api
 </table>
 
 目前模型情况：
-- 合成测试集：~~76.39%~~ ~~76.61%~~ 76.05%
-- 真实测试集：74.19%
 
-实际上这些准确率仅供参考，因为随着训练集合的增加，巨量的太模糊的图形验证码会导致准确率的下降，但是这不代表模型在模糊度中等偏上的识别准确率差
 
+常规评估：
 
 
 <div align="center">
-  <img src="images/Digital-Letters-OCR/evaluate.png">
+  <img src="images/Digital-Letters-OCR/normall_evaluate.png">
 </div>
 
 续训每轮损失：
 <div align="center">  
   <img src="images/Digital-Letters-OCR/loss_curve.png">
 </div>
+
+
+泛化评估：
+
+<div align="center">  
+  <img src="images/Digital-Letters-OCR/generalization_evaluate.png">
+</div>
+
+
+
 
 
 目前模型的准确率和泛化能力在实际场景中应该可以接受。
