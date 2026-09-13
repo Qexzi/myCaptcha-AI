@@ -36,6 +36,8 @@ class myDataset(Dataset):
         """
         valid = []
         invalid = []
+        total = len(paths)
+        bar_w = 30  # 进度条宽度(字符)
         for i, p in enumerate(paths):
             try:
                 with Image.open(p) as img:
@@ -43,8 +45,13 @@ class myDataset(Dataset):
                 valid.append(p)
             except Exception as e:
                 invalid.append((p, e))
-            if (i + 1) % 10000 == 0:
-                print(f'  数据校验进度: {i+1}/{len(paths)}')
+            if total and ((i + 1) % 1000 == 0 or i + 1 == total):  # 每 1000 张刷新一次进度条
+                pct = (i + 1) / total
+                filled = int(bar_w * pct)
+                bar = '█' * filled + '─' * (bar_w - filled)
+                print(f'\r  校验 [{bar}] {pct*100:5.1f}% {i+1:>8,}/{total:,}', end='', flush=True)
+        if total:
+            print()  # 进度条结束后换行,避免与后续输出挤在同一行
         if invalid:
             print(f'[警告] 发现 {len(invalid)} 张无法读取的图片,已自动剔除(共 {len(paths)} 张):')
             for p, e in invalid[:10]:
